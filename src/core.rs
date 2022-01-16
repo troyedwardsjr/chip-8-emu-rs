@@ -124,9 +124,14 @@ impl Emu {
 
     // Pattern match opcodes / instructions for execution
     match (digit1, digit2, digit3, digit4) { 
-      // Clear sreen
-      (0, 0, 0xE, 0) => { 
+      // Clear screen
+      (0, 0, 0xE, 0) => {
         self.screen = [false; SCREEN_WIDTH * SCREEN_HEIGHT]; 
+      },
+      // Return from subroutine
+      (0, 0, 0xE, 0xE) => { 
+        let ret_addr = self.pop(); 
+        self.pc = ret_addr;
       },
       (0, 0, 0, 0) => return, 
       (_, _, _, _) => unimplemented!("Unimplemented opcode: {}", op),
