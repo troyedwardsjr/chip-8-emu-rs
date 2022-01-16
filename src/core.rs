@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+
+use std::u16;
 pub const SCREEN_WIDTH: usize = 64;
 pub const SCREEN_HEIGHT: usize = 32;
 
@@ -103,6 +105,31 @@ impl Emu {
         // BEEP
       }
       self.st -= 1;
+    }
+  }
+
+  pub fn tick(&mut self) { 
+    // Fetch 
+    let op = self.fetch(); 
+    // Decode & Execute
+    self.execute(op);
+  }
+
+  pub fn execute(&mut self, op: u16) {
+    // Opcodes as digits
+    let digit1 = (op & 0xF000) >> 12; 
+    let digit2 = (op & 0x0F00) >> 8; 
+    let digit3 = (op & 0x00F0) >> 4; 
+    let digit4 = op & 0x000F;
+
+    // Pattern match opcodes / instructions for execution
+    match (digit1, digit2, digit3, digit4) { 
+      // Clear sreen
+      (0, 0, 0xE, 0) => { 
+        self.screen = [false; SCREEN_WIDTH * SCREEN_HEIGHT]; 
+      },
+      (0, 0, 0, 0) => return, 
+      (_, _, _, _) => unimplemented!("Unimplemented opcode: {}", op),
     }
   }
 }
